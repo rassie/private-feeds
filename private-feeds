@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+# private-feeds --- Private feeds for Google Calendar
+# Author: Nikolai Prokoschenko <nikolai@prokoschenko.de>
+# Created: 29 Dec 2008
+# Version: 0.01
+
+use warnings;
+use strict;
+
+use LWP;
+use LWP::UserAgent;
+use YAML;
+use CGI;
+use CGI::Carp qw( fatalsToBrowser);
+
+my $FEEDS = "feeds.yaml";
+
+my $q = CGI->new();
+
+sub leave {
+
+	my $q = CGI->new();
+	print $q->header("text/html");
+	print "\n";
+	exit;
+
+}
+
+my $q = CGI->new();
+
+my $uid = shift;
+
+leave unless ($uid);
+
+my ($hashref, $arrayref, $string) = YAML::LoadFile($FEEDS);
+
+my @key = grep { $_ =~ $uid } keys(%$hashref);
+
+if ( @key > 0 ) {
+
+    my $url = $hashref->{ shift @key };    
+
+    my $req = HTTP::Request->new(GET => $url);
+    my $ua = LWP::UserAgent->new;
+    $ua->agent("private-feeds/0.01");
+    
+    # Pass request to the user agent and get a response back
+    my $res = $ua->request($req);
+
+    # Check the outcome of the response
+    if ($res->is_success) {
+	my $type = $res->content_type( );
+	$q->header($type);
+	print "\n";
+        print $res->content;
+    } else {
+        leave;        
+    }
+} else {
+    leave;    
+}
+;
