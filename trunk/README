@@ -1,0 +1,31 @@
+private-feeds
+=============
+
+What's needed
+-------------
+
+* a webhost with Perl support
+* .htaccess support
+* Crypt::SSLeay (for SSL support), LWP, CGI and YAML Perl modules
+
+
+Usage
+-----
+
+* put feeds.yaml and private-feeds to your cgi-bin/ directory
+* generate a UUID (whatever kind, just unique enough not to get guessed by people)
+* put this UUID together with your feed URLs (including username and password) into feeds.yaml
+* IMPORTANT: put the following into your .htaccess
+
+<Files feeds.yaml>
+        deny from all
+</Files>
+
+and make sure that you can't access feeds.yaml from outside.
+
+* now try to call the script with your UUID as parameter, e.g. http://your-web-site.com/cgi-bin/private-feeds?f8ce7af7-598f-4e04-9c6f-de0b261748d3 You should now see the contents of the password-protected page associated with this UUID. 
+
+TODO
+----
+
+* YAML is actually overkill, throw it out
